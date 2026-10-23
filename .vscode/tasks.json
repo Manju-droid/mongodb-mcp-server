@@ -1,0 +1,15 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "Run ls -l on MCP server entrypoint",
+			"type": "shell",
+			"command": "ls",
+			"args": [
+				"-l",
+				"/Users/manjunadhapabolu/Downloads/mongodb-mcp-server-main/packages/mongodb-mcp-server/dist/esm/index.js"
+			],
+			"isBackground": false
+		}
+	]
+}
