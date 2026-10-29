@@ -33,3 +33,4 @@ ENV MDB_MCP_LOGGERS=stderr,mcp
 ENV NODE_ENV=production
 
 ENTRYPOINT ["node", "/app/packages/mongodb-mcp-server/dist/esm/index.js"]
+
