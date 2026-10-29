@@ -1,0 +1,35 @@
+# Multi-stage Dockerfile: Builds MongoDB MCP Server directly from Git repository source
+# Use this when building custom changes from your repository rather than npm releases.
+FROM node:24-alpine AS builder
+
+WORKDIR /app
+
+# Enable pnpm via corepack
+RUN corepack enable && corepack prepare pnpm@11.5.1 --activate
+
+# Copy repository manifests and lockfiles
+COPY pnpm-lock.yaml pnpm-workspace.yaml package.json tsconfig.json tsconfig.base.json ./
+COPY packages/ ./packages/
+
+# Install dependencies and build monorepo packages
+RUN pnpm install --frozen-lockfile
+RUN pnpm run build
+
+# Production runtime stage
+FROM node:24-alpine AS runner
+
+RUN apk upgrade --no-cache && \
+    addgroup -S mcp && adduser -S mcp -G mcp
+
+WORKDIR /app
+
+# Copy built packages and runtime assets from builder
+COPY --from=builder --chown=mcp:mcp /app /app
+
+USER mcp
+WORKDIR /home/mcp
+
+ENV MDB_MCP_LOGGERS=stderr,mcp
+ENV NODE_ENV=production
+
+ENTRYPOINT ["node", "/app/packages/mongodb-mcp-server/dist/esm/index.js"]
