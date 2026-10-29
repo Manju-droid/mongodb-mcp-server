@@ -1,7 +1,5 @@
-name: Daily Release Docker Image
+name: Release Docker Image
 on:
-  schedule:
-    - cron: "0 1 * * *" # Every day at 1:00 AM
   workflow_dispatch:
     inputs:
       release_channel:
@@ -64,7 +62,7 @@ jobs:
       contents: read
       issues: write
     needs: [get-version, docker-push]
-    if: ${{ failure() }}
+    if: ${{ failure() && vars.DEVTOOLS_BOT_APP_ID != '' && secrets.DEVTOOLS_BOT_PRIVATE_KEY != '' }}
     steps:
       - uses: GitHubSecurityLab/actions-permissions/monitor@v1
         with:
